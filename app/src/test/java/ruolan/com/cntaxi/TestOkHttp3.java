@@ -4,8 +4,11 @@ import android.util.Log;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 
+import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -50,10 +53,10 @@ public class TestOkHttp3 {
             = MediaType.parse("application/json; charset=utf-8");
 
     @Test
-    public void testPost(){
+    public void testPost() {
 
 
-        RequestBody body = RequestBody.create(JSON,"{\"name\":\"若兰明月\"}");
+        RequestBody body = RequestBody.create(JSON, "{\"name\":\"若兰明月\"}");
 
         String url = "http://httpbin.org/post";
         //创建OkHttpClient对象
@@ -78,7 +81,7 @@ public class TestOkHttp3 {
     }
 
     @Test
-    public void testInterceptor(){
+    public void testInterceptor() {
 
         Interceptor interceptor = new Interceptor() {
             @Override
@@ -89,22 +92,22 @@ public class TestOkHttp3 {
                 //request获取
                 Request request = chain.request();
                 HttpUrl url = request.url();
-                System.out.println("请求地址 : " + url.toString()  );
+                System.out.println("请求地址 : " + url.toString());
                 String method = request.method();
-                System.out.println("请求方式 : " + method  );
+                System.out.println("请求方式 : " + method);
 
                 Response response = chain.proceed(request);
 
                 long endTime = System.currentTimeMillis();
 
-                System.out.println("请求时间 : " + (endTime - startTime )  );
+                System.out.println("请求时间 : " + (endTime - startTime));
 
                 return response;
             }
         };
 
 
-        RequestBody body = RequestBody.create(JSON,"{\"name\":\"若兰明月\"}");
+        RequestBody body = RequestBody.create(JSON, "{\"name\":\"若兰明月\"}");
 
         String url = "http://httpbin.org/post";
         //创建OkHttpClient对象
@@ -128,7 +131,45 @@ public class TestOkHttp3 {
             e.printStackTrace();
         }
 
+    }
 
+    @Test
+    public void testCache() {
+
+        //创建一个缓存对象
+        Cache cache = new Cache(new File("cache.cache"), 1024 * 1024);
+
+
+        String url = "http://httpbin.org/get?id=1";
+        //创建OkHttpClient对象
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cache(cache)
+                .build();
+        //创建request
+        Request request = new Request.Builder()
+                .url(url)
+//                .cacheControl(CacheControl.FORCE_NETWORK)  //可以设置强制网络还是缓存中取数据
+                .build();
+        //执行request
+        try {
+            Response response = client.newCall(request).execute();
+            Response responseCache = response.cacheResponse();
+            Response responseNet = response.networkResponse();
+
+            if (response.isSuccessful()) {
+
+                if (responseCache != null) {
+                    System.out.print("缓存  response : " + response.body().string());
+                } else if (responseNet != null) {
+                    System.out.print("网络中 response : " + response.body().string());
+                }
+
+            }
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
 
     }
 
