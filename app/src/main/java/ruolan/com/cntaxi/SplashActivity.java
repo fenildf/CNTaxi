@@ -21,6 +21,7 @@ public class SplashActivity extends AppCompatActivity {
             logo.setImageDrawable(anim1);
             anim1.start();
         }
+
         /**
          * 延时 3 秒然后跳转到 main 页面
          */

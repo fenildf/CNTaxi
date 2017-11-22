@@ -4,6 +4,9 @@ import android.app.Application;
 
 /**
  * Created by wuyinlei on 2017/11/20.
+ *
+ *
+ * @function
  */
 
 public class CNApplication extends Application {
